@@ -1,10 +1,14 @@
+import os
 from datetime import datetime
 
-from flask import Flask, render_template
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY",
+    "development-secret-key",
+)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///purchase_guard.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -25,11 +29,60 @@ class Purchase(db.Model):
     __tablename__ = "purchases"
     id = db.Column(db.Integer, primary_key=True)
 
+def parse_optional_date(value):
+    if not value:
+        return None
+
+    return datetime.strptime(value, "%Y-%m-%d").date()
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    purchases = db.session.execute(
+        db.select(Purchase).order_by(Purchase.created_at.desc())
+    ).scalars().all()
 
+    return render_template("index.html", purchases=purchases)
+
+@app.route("/purchases/new", methods=["GET", "POST"])
+def create_purchase():
+    if request.method == "POST":
+        item_name = request.form.get("item_name", "").strip()
+        purchase_date_value = request.form.get("purchase_date", "")
+
+        if not item_name:
+            flash("Item name is required.", "error")
+            return render_template("create_purchase.html")
+
+        if not purchase_date_value:
+            flash("Purchase date is required.", "error")
+            return render_template("create_purchase.html")
+
+        purchase = Purchase(
+            item_name=item_name,
+            category=request.form.get("category", "").strip() or None,
+            store_name=request.form.get("store_name", "").strip() or None,
+            purchase_date=parse_optional_date(purchase_date_value),
+            price=(
+                int(request.form["price"])
+                if request.form.get("price")
+                else None
+            ),
+            return_deadline=parse_optional_date(
+                request.form.get("return_deadline", "")
+            ),
+            warranty_end_date=parse_optional_date(
+                request.form.get("warranty_end_date", "")
+            ),
+            notes=request.form.get("notes", "").strip() or None,
+        )
+
+        db.session.add(purchase)
+        db.session.commit()
+
+        flash("Purchase saved successfully.", "success")
+        return redirect(url_for("index"))
+
+    return render_template("create_purchase.html")
 
 if __name__ == "__main__":
     with app.app_context():
