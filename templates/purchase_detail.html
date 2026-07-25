@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ purchase.item_name }} | PurchaseGuard</title>
+</head>
+<body>
+    <h1>{{ purchase.item_name }}</h1>
+
+    <dl>
+        <dt>Category</dt>
+        <dd>{{ purchase.category or "—" }}</dd>
+
+        <dt>Store</dt>
+        <dd>{{ purchase.store_name or "—" }}</dd>
+
+        <dt>Purchase date</dt>
+        <dd>{{ purchase.purchase_date }}</dd>
+
+        <dt>Price</dt>
+        <dd>
+            {% if purchase.price is not none %}
+                ¥{{ purchase.price }}
+            {% else %}
+                —
+            {% endif %}
+        </dd>
+
+        <dt>Return deadline</dt>
+        <dd>{{ purchase.return_deadline or "—" }}</dd>
+
+        <dt>Warranty end date</dt>
+        <dd>{{ purchase.warranty_end_date or "—" }}</dd>
+
+        <dt>Notes</dt>
+        <dd>{{ purchase.notes or "—" }}</dd>
+
+        <dt>Created at</dt>
+        <dd>{{ purchase.created_at }}</dd>
+    </dl>
+
+    <p>
+        <a href="{{ url_for('index') }}">Back to purchases</a>
+    </p>
+</body>
+</html>

@@ -43,6 +43,14 @@ def index():
 
     return render_template("index.html", purchases=purchases)
 
+@app.route("/purchases/<int:purchase_id>")
+def purchase_detail(purchase_id):
+    purchase = db.get_or_404(Purchase, purchase_id)
+    return render_template(
+        "purchase_detail.html",
+        purchase=purchase,
+    )
+
 @app.route("/purchases/new", methods=["GET", "POST"])
 def create_purchase():
     if request.method == "POST":
