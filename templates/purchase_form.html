@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} | PurchaseGuard</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h1>{{ page_title }}</h1>
+
+    <form method="post">
+        <div>
+            <label for="item_name">Item name</label>
+            <input
+                type="text"
+                id="item_name"
+                name="item_name"
+                value="{{ purchase.item_name if purchase else '' }}"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="category">Category</label>
+            <input
+                type="text"
+                id="category"
+                name="category"
+                value="{{ purchase.category if purchase and purchase.category else '' }}"
+            >
+        </div>
+
+        <div>
+            <label for="store_name">Store name</label>
+            <input
+                type="text"
+                id="store_name"
+                name="store_name"
+                value="{{ purchase.store_name if purchase and purchase.store_name else '' }}"
+            >
+        </div>
+
+        <div>
+            <label for="purchase_date">Purchase date</label>
+            <input
+                type="date"
+                id="purchase_date"
+                name="purchase_date"
+                value="{{ purchase.purchase_date.isoformat() if purchase and purchase.purchase_date else '' }}"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="price">Price</label>
+            <input
+                type="number"
+                id="price"
+                name="price"
+                min="0"
+                value="{{ purchase.price if purchase and purchase.price is not none else '' }}"
+            >
+        </div>
+
+        <div>
+            <label for="return_deadline">Return deadline</label>
+            <input
+                type="date"
+                id="return_deadline"
+                name="return_deadline"
+                value="{{ purchase.return_deadline.isoformat() if purchase and purchase.return_deadline else '' }}"
+            >
+        </div>
+
+        <div>
+            <label for="warranty_end_date">Warranty end date</label>
+            <input
+                type="date"
+                id="warranty_end_date"
+                name="warranty_end_date"
+                value="{{ purchase.warranty_end_date.isoformat() if purchase and purchase.warranty_end_date else '' }}"
+            >
+        </div>
+
+        <div>
+            <label for="notes">Notes</label>
+            <textarea
+                id="notes"
+                name="notes"
+                rows="4"
+            >{{ purchase.notes if purchase and purchase.notes else '' }}</textarea>
+        </div>
+
+        <button type="submit">{{ button_text }}</button>
+    </form>
+
+    <p>
+        {% if purchase %}
+            <a href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}">
+                Back to purchase details
+            </a>
+        {% else %}
+            <a href="{{ url_for('index') }}">
+                Back to purchases
+            </a>
+        {% endif %}
+    </p>
+</body>
+</html>
