@@ -36,25 +36,29 @@
                     <th>Warranty end</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for purchase in purchases %}
-                    <tr>
-                        <td>{{ purchase.item_name }}</td>
-                        <td>{{ purchase.category or "—" }}</td>
-                        <td>{{ purchase.store_name or "—" }}</td>
-                        <td>{{ purchase.purchase_date }}</td>
-                        <td>
-                            {% if purchase.price is not none %}
-                                ¥{{ purchase.price }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td>{{ purchase.return_deadline or "—" }}</td>
-                        <td>{{ purchase.warranty_end_date or "—" }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+    <tbody>
+        {% for purchase in purchases %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}">
+                        {{ purchase.item_name }}
+                    </a>
+                </td>
+                <td>{{ purchase.category or "—" }}</td>
+                <td>{{ purchase.store_name or "—" }}</td>
+                <td>{{ purchase.purchase_date }}</td>
+                <td>
+                    {% if purchase.price is not none %}
+                        ¥{{ purchase.price }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ purchase.return_deadline or "—" }}</td>
+                <td>{{ purchase.warranty_end_date or "—" }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
         </table>
     {% else %}
         <p>No purchases have been added yet.</p>
