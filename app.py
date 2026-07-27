@@ -84,6 +84,16 @@ def create_purchase():
 
     return render_template("create_purchase.html")
 
+@app.route("/purchases/<int:purchase_id>/delete", methods=["POST"])
+def delete_purchase(purchase_id):
+    purchase = db.get_or_404(Purchase, purchase_id)
+
+    db.session.delete(purchase)
+    db.session.commit()
+
+    flash("Purchase deleted successfully.", "success")
+    return redirect(url_for("index"))
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
