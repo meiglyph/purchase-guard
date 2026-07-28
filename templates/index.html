@@ -85,7 +85,9 @@
                     <th>Purchase date</th>
                     <th>Price</th>
                     <th>Return deadline</th>
+                    <th>Return status</th>
                     <th>Warranty end</th>
+                    <th>Warranty status</th>
                 </tr>
             </thead>
             <tbody>
@@ -107,7 +109,9 @@
                             {% endif %}
                         </td>
                         <td>{{ purchase.return_deadline or "—" }}</td>
+                        <td>{{ purchase.return_status }}</td>
                         <td>{{ purchase.warranty_end_date or "—" }}</td>
+                        <td>{{ purchase.warranty_status }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
