@@ -1,6 +1,5 @@
 import os
-from datetime import datetime
-
+from datetime import date, datetime
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
@@ -33,6 +32,51 @@ class Purchase(db.Model):
         default=datetime.utcnow,
         nullable=False,
     )
+    @property
+    def return_status(self):
+        if self.return_deadline is None:
+            return "No deadline"
+
+        days_remaining = (self.return_deadline - date.today()).days
+
+        if days_remaining > 1:
+            return f"{days_remaining} days left"
+
+        if days_remaining == 1:
+            return "1 day left"
+
+        if days_remaining == 0:
+            return "Due today"
+
+        days_expired = abs(days_remaining)
+
+        if days_expired == 1:
+            return "Expired 1 day ago"
+
+        return f"Expired {days_expired} days ago"
+
+    @property
+    def warranty_status(self):
+        if self.warranty_end_date is None:
+            return "No warranty"
+
+        days_remaining = (self.warranty_end_date - date.today()).days
+
+        if days_remaining > 1:
+            return f"{days_remaining} days left"
+
+        if days_remaining == 1:
+            return "1 day left"
+
+        if days_remaining == 0:
+            return "Expires today"
+
+        days_expired = abs(days_remaining)
+
+        if days_expired == 1:
+            return "Expired 1 day ago"
+
+        return f"Expired {days_expired} days ago"
 
 
 def parse_optional_date(value):
