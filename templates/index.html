@@ -4,122 +4,201 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PurchaseGuard</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    <main class="page">
+        <header class="site-header">
+            <div class="brand">
+                <div class="brand-mark">P</div>
+                <div>
+                    <h1>PurchaseGuard</h1>
+                    <p>Returns and warranties, under control.</p>
+                </div>
+            </div>
+        </header>
 
-    <h1>PurchaseGuard</h1>
-    <p>Track return deadlines and warranties in one place.</p>
-
-    <p>
-        <a href="{{ url_for('create_purchase') }}">Add Purchase</a>
-    </p>
-
-    <h2>Purchases</h2>
-
-    <form method="get" action="{{ url_for('index') }}">
-        <div>
-            <label for="q">Search by item name</label>
-            <input
-                type="search"
-                id="q"
-                name="q"
-                value="{{ search_query }}"
-                placeholder="e.g. keyboard"
-            >
-        </div>
-
-        <div>
-            <label for="sort">Sort by</label>
-            <select id="sort" name="sort">
-                <option
-                    value="created_at_desc"
-                    {% if selected_sort == "created_at_desc" %}selected{% endif %}
-                >
-                    Recently added
-                </option>
-
-                <option
-                    value="purchase_date_desc"
-                    {% if selected_sort == "purchase_date_desc" %}selected{% endif %}
-                >
-                    Newest purchase date
-                </option>
-
-                <option
-                    value="purchase_date_asc"
-                    {% if selected_sort == "purchase_date_asc" %}selected{% endif %}
-                >
-                    Oldest purchase date
-                </option>
-
-                <option
-                    value="return_deadline_asc"
-                    {% if selected_sort == "return_deadline_asc" %}selected{% endif %}
-                >
-                    Nearest return deadline
-                </option>
-            </select>
-        </div>
-
-        <button type="submit">Apply</button>
-
-        {% if search_query or selected_sort != "created_at_desc" %}
-            <a href="{{ url_for('index') }}">Clear filters</a>
-        {% endif %}
-    </form>
-
-    {% if purchases %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Category</th>
-                    <th>Store</th>
-                    <th>Purchase date</th>
-                    <th>Price</th>
-                    <th>Return deadline</th>
-                    <th>Return status</th>
-                    <th>Warranty end</th>
-                    <th>Warranty status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for purchase in purchases %}
-                    <tr>
-                        <td>
-                            <a href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}">
-                                {{ purchase.item_name }}
-                            </a>
-                        </td>
-                        <td>{{ purchase.category or "—" }}</td>
-                        <td>{{ purchase.store_name or "—" }}</td>
-                        <td>{{ purchase.purchase_date }}</td>
-                        <td>
-                            {% if purchase.price is not none %}
-                                ¥{{ purchase.price }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td>{{ purchase.return_deadline or "—" }}</td>
-                        <td>{{ purchase.return_status }}</td>
-                        <td>{{ purchase.warranty_end_date or "—" }}</td>
-                        <td>{{ purchase.warranty_status }}</td>
-                    </tr>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">
+                        {{ message }}
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% elif search_query %}
-        <p>No purchases matched your search.</p>
-    {% else %}
-        <p>No purchases have been added yet.</p>
-    {% endif %}
+            {% endif %}
+        {% endwith %}
+
+        <section class="hero card">
+            <div>
+                <h2>Never miss a return deadline again.</h2>
+                <p>
+                    Keep purchase details, return deadlines, and warranty
+                    information organized in one simple dashboard.
+                </p>
+            </div>
+
+            <a
+                class="button button-primary"
+                href="{{ url_for('create_purchase') }}"
+            >
+                + Add Purchase
+            </a>
+        </section>
+
+        <section class="section-card card">
+            <div class="section-heading">
+                <h2>Your purchases</h2>
+                <span class="muted">
+                    {{ purchases|length }} item{% if purchases|length != 1 %}s{% endif %}
+                </span>
+            </div>
+
+            <form
+                class="filters"
+                method="get"
+                action="{{ url_for('index') }}"
+            >
+                <div class="form-field">
+                    <label for="q">Search by item name</label>
+                    <input
+                        type="search"
+                        id="q"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="e.g. keyboard"
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="sort">Sort by</label>
+                    <select id="sort" name="sort">
+                        <option
+                            value="created_at_desc"
+                            {% if selected_sort == "created_at_desc" %}selected{% endif %}
+                        >
+                            Recently added
+                        </option>
+                        <option
+                            value="purchase_date_desc"
+                            {% if selected_sort == "purchase_date_desc" %}selected{% endif %}
+                        >
+                            Newest purchase date
+                        </option>
+                        <option
+                            value="purchase_date_asc"
+                            {% if selected_sort == "purchase_date_asc" %}selected{% endif %}
+                        >
+                            Oldest purchase date
+                        </option>
+                        <option
+                            value="return_deadline_asc"
+                            {% if selected_sort == "return_deadline_asc" %}selected{% endif %}
+                        >
+                            Nearest return deadline
+                        </option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button
+                        class="button button-primary"
+                        type="submit"
+                    >
+                        Apply
+                    </button>
+
+                    {% if search_query or selected_sort != "created_at_desc" %}
+                        <a
+                            class="button button-secondary"
+                            href="{{ url_for('index') }}"
+                        >
+                            Clear
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+
+            {% if purchases %}
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Store</th>
+                                <th>Purchase date</th>
+                                <th>Price</th>
+                                <th>Return deadline</th>
+                                <th>Return status</th>
+                                <th>Warranty end</th>
+                                <th>Warranty status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for purchase in purchases %}
+                                <tr>
+                                    <td>
+                                        <a
+                                            class="item-link"
+                                            href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}"
+                                        >
+                                            {{ purchase.item_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ purchase.category or "—" }}</td>
+                                    <td>{{ purchase.store_name or "—" }}</td>
+                                    <td>{{ purchase.purchase_date }}</td>
+                                    <td>
+                                        {% if purchase.price is not none %}
+                                            ¥{{ "{:,}".format(purchase.price) }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ purchase.return_deadline or "—" }}</td>
+                                    <td>
+                                        <span class="status">
+                                            {{ purchase.return_status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ purchase.warranty_end_date or "—" }}</td>
+                                    <td>
+                                        <span class="status">
+                                            {{ purchase.warranty_status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% elif search_query %}
+                <div class="empty-state">
+                    <h3>No matching purchases</h3>
+                    <p>Try changing or clearing your search.</p>
+                    <a
+                        class="button button-secondary"
+                        href="{{ url_for('index') }}"
+                    >
+                        Clear search
+                    </a>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No purchases yet</h3>
+                    <p>Add your first purchase to start tracking it.</p>
+                    <a
+                        class="button button-primary"
+                        href="{{ url_for('create_purchase') }}"
+                    >
+                        Add Purchase
+                    </a>
+                </div>
+            {% endif %}
+        </section>
+    </main>
 </body>
 </html>
