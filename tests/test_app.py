@@ -229,3 +229,132 @@ def test_edit_purchase_rejects_negative_price(
         )
 
         assert purchase.price is None
+
+def test_create_purchase_rejects_return_deadline_before_purchase_date(
+    client,
+    app,
+):
+    response = client.post(
+        "/purchases/new",
+        data={
+            "item_name": "Test Laptop",
+            "purchase_date": "2026-07-30",
+            "return_deadline": "2026-07-29",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert (
+        b"Return deadline cannot be before purchase date."
+        in response.data
+    )
+
+    with app.app_context():
+        purchases = db.session.execute(
+            db.select(Purchase)
+        ).scalars().all()
+
+        assert purchases == []
+
+
+def test_create_purchase_rejects_warranty_end_before_purchase_date(
+    client,
+    app,
+):
+    response = client.post(
+        "/purchases/new",
+        data={
+            "item_name": "Test Laptop",
+            "purchase_date": "2026-07-30",
+            "warranty_end_date": "2026-07-29",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert (
+        b"Warranty end date cannot be before purchase date."
+        in response.data
+    )
+
+    with app.app_context():
+        purchases = db.session.execute(
+            db.select(Purchase)
+        ).scalars().all()
+
+        assert purchases == []
+
+
+def test_edit_purchase_rejects_return_deadline_before_purchase_date(
+    client,
+    app,
+):
+    add_purchase(client)
+
+    with app.app_context():
+        purchase = db.session.execute(
+            db.select(Purchase)
+        ).scalar_one()
+        purchase_id = purchase.id
+
+    response = client.post(
+        f"/purchases/{purchase_id}/edit",
+        data={
+            "item_name": "Test Laptop",
+            "purchase_date": "2026-07-30",
+            "return_deadline": "2026-07-29",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert (
+        b"Return deadline cannot be before purchase date."
+        in response.data
+    )
+
+    with app.app_context():
+        purchase = db.session.get(
+            Purchase,
+            purchase_id,
+        )
+
+        assert purchase.return_deadline is None
+
+
+def test_edit_purchase_rejects_warranty_end_before_purchase_date(
+    client,
+    app,
+):
+    add_purchase(client)
+
+    with app.app_context():
+        purchase = db.session.execute(
+            db.select(Purchase)
+        ).scalar_one()
+        purchase_id = purchase.id
+
+    response = client.post(
+        f"/purchases/{purchase_id}/edit",
+        data={
+            "item_name": "Test Laptop",
+            "purchase_date": "2026-07-30",
+            "warranty_end_date": "2026-07-29",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert (
+        b"Warranty end date cannot be before purchase date."
+        in response.data
+    )
+
+    with app.app_context():
+        purchase = db.session.get(
+            Purchase,
+            purchase_id,
+        )
+
+        assert purchase.warranty_end_date is None

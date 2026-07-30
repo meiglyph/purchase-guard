@@ -18,7 +18,10 @@ db = SQLAlchemy()
 class Purchase(db.Model):
     __tablename__ = "purchases"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
     item_name = db.Column(
         db.String(120),
         nullable=False,
@@ -117,6 +120,30 @@ def parse_optional_price(value):
         )
 
     return price
+
+
+def validate_purchase_dates(
+    purchase_date,
+    return_deadline,
+    warranty_end_date,
+):
+    if (
+        return_deadline is not None
+        and return_deadline < purchase_date
+    ):
+        raise ValueError(
+            "Return deadline cannot be before "
+            "purchase date."
+        )
+
+    if (
+        warranty_end_date is not None
+        and warranty_end_date < purchase_date
+    ):
+        raise ValueError(
+            "Warranty end date cannot be before "
+            "purchase date."
+        )
 
 
 def create_app(test_config=None):
@@ -220,15 +247,8 @@ def create_app(test_config=None):
                 "",
             ).strip()
 
-            purchase_date_value = (
-                request.form.get(
-                    "purchase_date",
-                    "",
-                )
-            )
-
-            price_value = request.form.get(
-                "price",
+            purchase_date_value = request.form.get(
+                "purchase_date",
                 "",
             )
 
@@ -258,7 +278,34 @@ def create_app(test_config=None):
 
             try:
                 price = parse_optional_price(
-                    price_value
+                    request.form.get(
+                        "price",
+                        "",
+                    )
+                )
+
+                purchase_date = parse_optional_date(
+                    purchase_date_value
+                )
+
+                return_deadline = parse_optional_date(
+                    request.form.get(
+                        "return_deadline",
+                        "",
+                    )
+                )
+
+                warranty_end_date = parse_optional_date(
+                    request.form.get(
+                        "warranty_end_date",
+                        "",
+                    )
+                )
+
+                validate_purchase_dates(
+                    purchase_date,
+                    return_deadline,
+                    warranty_end_date,
                 )
             except ValueError as error:
                 flash(
@@ -288,24 +335,10 @@ def create_app(test_config=None):
                     ).strip()
                     or None
                 ),
-                purchase_date=parse_optional_date(
-                    purchase_date_value
-                ),
+                purchase_date=purchase_date,
                 price=price,
-                return_deadline=parse_optional_date(
-                    request.form.get(
-                        "return_deadline",
-                        "",
-                    )
-                ),
-                warranty_end_date=(
-                    parse_optional_date(
-                        request.form.get(
-                            "warranty_end_date",
-                            "",
-                        )
-                    )
-                ),
+                return_deadline=return_deadline,
+                warranty_end_date=warranty_end_date,
                 notes=(
                     request.form.get(
                         "notes",
@@ -350,15 +383,8 @@ def create_app(test_config=None):
                 "",
             ).strip()
 
-            purchase_date_value = (
-                request.form.get(
-                    "purchase_date",
-                    "",
-                )
-            )
-
-            price_value = request.form.get(
-                "price",
+            purchase_date_value = request.form.get(
+                "purchase_date",
                 "",
             )
 
@@ -388,7 +414,34 @@ def create_app(test_config=None):
 
             try:
                 price = parse_optional_price(
-                    price_value
+                    request.form.get(
+                        "price",
+                        "",
+                    )
+                )
+
+                purchase_date = parse_optional_date(
+                    purchase_date_value
+                )
+
+                return_deadline = parse_optional_date(
+                    request.form.get(
+                        "return_deadline",
+                        "",
+                    )
+                )
+
+                warranty_end_date = parse_optional_date(
+                    request.form.get(
+                        "warranty_end_date",
+                        "",
+                    )
+                )
+
+                validate_purchase_dates(
+                    purchase_date,
+                    return_deadline,
+                    warranty_end_date,
                 )
             except ValueError as error:
                 flash(
@@ -420,30 +473,11 @@ def create_app(test_config=None):
                 or None
             )
 
-            purchase.purchase_date = (
-                parse_optional_date(
-                    purchase_date_value
-                )
-            )
-
+            purchase.purchase_date = purchase_date
             purchase.price = price
-
-            purchase.return_deadline = (
-                parse_optional_date(
-                    request.form.get(
-                        "return_deadline",
-                        "",
-                    )
-                )
-            )
-
+            purchase.return_deadline = return_deadline
             purchase.warranty_end_date = (
-                parse_optional_date(
-                    request.form.get(
-                        "warranty_end_date",
-                        "",
-                    )
-                )
+                warranty_end_date
             )
 
             purchase.notes = (
