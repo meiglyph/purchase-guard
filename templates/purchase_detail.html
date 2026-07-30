@@ -66,10 +66,10 @@
                 </div>
 
                 <div class="detail-item">
-                    <dt>Price</dt>
+                    <dt>Price (USD)</dt>
                     <dd>
                         {% if purchase.price is not none %}
-                            ¥{{ "{:,}".format(purchase.price) }}
+                            US${{ "{:,}".format(purchase.price) }}
                         {% else %}
                             —
                         {% endif %}
