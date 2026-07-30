@@ -1,5 +1,6 @@
 import os
 from datetime import UTC, date, datetime
+
 from flask import (
     Flask,
     flash,
@@ -18,10 +19,16 @@ class Purchase(db.Model):
     __tablename__ = "purchases"
 
     id = db.Column(db.Integer, primary_key=True)
-    item_name = db.Column(db.String(120), nullable=False)
+    item_name = db.Column(
+        db.String(120),
+        nullable=False,
+    )
     category = db.Column(db.String(80))
     store_name = db.Column(db.String(120))
-    purchase_date = db.Column(db.Date, nullable=False)
+    purchase_date = db.Column(
+        db.Date,
+        nullable=False,
+    )
     price = db.Column(db.Integer)
     return_deadline = db.Column(db.Date)
     warranty_end_date = db.Column(db.Date)
@@ -93,6 +100,25 @@ def parse_optional_date(value):
     ).date()
 
 
+def parse_optional_price(value):
+    if not value:
+        return None
+
+    try:
+        price = int(value)
+    except ValueError as error:
+        raise ValueError(
+            "Price must be a whole number."
+        ) from error
+
+    if price < 0:
+        raise ValueError(
+            "Price cannot be negative."
+        )
+
+    return price
+
+
 def create_app(test_config=None):
     app = Flask(__name__)
 
@@ -118,6 +144,7 @@ def create_app(test_config=None):
             "q",
             "",
         ).strip()
+
         sort = request.args.get(
             "sort",
             "created_at_desc",
@@ -168,7 +195,9 @@ def create_app(test_config=None):
             selected_sort=selected_sort,
         )
 
-    @app.route("/purchases/<int:purchase_id>")
+    @app.route(
+        "/purchases/<int:purchase_id>"
+    )
     def purchase_detail(purchase_id):
         purchase = db.get_or_404(
             Purchase,
@@ -190,8 +219,16 @@ def create_app(test_config=None):
                 "item_name",
                 "",
             ).strip()
-            purchase_date_value = request.form.get(
-                "purchase_date",
+
+            purchase_date_value = (
+                request.form.get(
+                    "purchase_date",
+                    "",
+                )
+            )
+
+            price_value = request.form.get(
+                "price",
                 "",
             )
 
@@ -210,6 +247,22 @@ def create_app(test_config=None):
             if not purchase_date_value:
                 flash(
                     "Purchase date is required.",
+                    "error",
+                )
+                return render_template(
+                    "purchase_form.html",
+                    purchase=None,
+                    page_title="Add Purchase",
+                    button_text="Save Purchase",
+                )
+
+            try:
+                price = parse_optional_price(
+                    price_value
+                )
+            except ValueError as error:
+                flash(
+                    str(error),
                     "error",
                 )
                 return render_template(
@@ -238,11 +291,7 @@ def create_app(test_config=None):
                 purchase_date=parse_optional_date(
                     purchase_date_value
                 ),
-                price=(
-                    int(request.form["price"])
-                    if request.form.get("price")
-                    else None
-                ),
+                price=price,
                 return_deadline=parse_optional_date(
                     request.form.get(
                         "return_deadline",
@@ -273,7 +322,10 @@ def create_app(test_config=None):
                 "Purchase saved successfully.",
                 "success",
             )
-            return redirect(url_for("index"))
+
+            return redirect(
+                url_for("index")
+            )
 
         return render_template(
             "purchase_form.html",
@@ -297,8 +349,16 @@ def create_app(test_config=None):
                 "item_name",
                 "",
             ).strip()
-            purchase_date_value = request.form.get(
-                "purchase_date",
+
+            purchase_date_value = (
+                request.form.get(
+                    "purchase_date",
+                    "",
+                )
+            )
+
+            price_value = request.form.get(
+                "price",
                 "",
             )
 
@@ -326,7 +386,24 @@ def create_app(test_config=None):
                     button_text="Update Purchase",
                 )
 
+            try:
+                price = parse_optional_price(
+                    price_value
+                )
+            except ValueError as error:
+                flash(
+                    str(error),
+                    "error",
+                )
+                return render_template(
+                    "purchase_form.html",
+                    purchase=purchase,
+                    page_title="Edit Purchase",
+                    button_text="Update Purchase",
+                )
+
             purchase.item_name = item_name
+
             purchase.category = (
                 request.form.get(
                     "category",
@@ -334,6 +411,7 @@ def create_app(test_config=None):
                 ).strip()
                 or None
             )
+
             purchase.store_name = (
                 request.form.get(
                     "store_name",
@@ -341,16 +419,15 @@ def create_app(test_config=None):
                 ).strip()
                 or None
             )
+
             purchase.purchase_date = (
                 parse_optional_date(
                     purchase_date_value
                 )
             )
-            purchase.price = (
-                int(request.form["price"])
-                if request.form.get("price")
-                else None
-            )
+
+            purchase.price = price
+
             purchase.return_deadline = (
                 parse_optional_date(
                     request.form.get(
@@ -359,6 +436,7 @@ def create_app(test_config=None):
                     )
                 )
             )
+
             purchase.warranty_end_date = (
                 parse_optional_date(
                     request.form.get(
@@ -367,6 +445,7 @@ def create_app(test_config=None):
                     )
                 )
             )
+
             purchase.notes = (
                 request.form.get(
                     "notes",
@@ -381,6 +460,7 @@ def create_app(test_config=None):
                 "Purchase updated successfully.",
                 "success",
             )
+
             return redirect(
                 url_for(
                     "purchase_detail",
@@ -412,7 +492,10 @@ def create_app(test_config=None):
             "Purchase deleted successfully.",
             "success",
         )
-        return redirect(url_for("index"))
+
+        return redirect(
+            url_for("index")
+        )
 
     with app.app_context():
         db.create_all()
