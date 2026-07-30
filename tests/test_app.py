@@ -171,3 +171,61 @@ def test_missing_purchase_returns_404(client):
     response = client.get("/purchases/9999")
 
     assert response.status_code == 404
+
+def test_create_purchase_rejects_negative_price(
+    client,
+    app,
+):
+    response = client.post(
+        "/purchases/new",
+        data={
+            "item_name": "Test Laptop",
+            "purchase_date": "2026-07-30",
+            "price": "-1000",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert b"Price cannot be negative." in response.data
+
+    with app.app_context():
+        purchases = db.session.execute(
+            db.select(Purchase)
+        ).scalars().all()
+
+        assert purchases == []
+
+
+def test_edit_purchase_rejects_negative_price(
+    client,
+    app,
+):
+    add_purchase(client)
+
+    with app.app_context():
+        purchase = db.session.execute(
+            db.select(Purchase)
+        ).scalar_one()
+        purchase_id = purchase.id
+
+    response = client.post(
+        f"/purchases/{purchase_id}/edit",
+        data={
+            "item_name": "Test Laptop",
+            "purchase_date": "2026-07-30",
+            "price": "-1000",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert b"Price cannot be negative." in response.data
+
+    with app.app_context():
+        purchase = db.session.get(
+            Purchase,
+            purchase_id,
+        )
+
+        assert purchase.price is None
