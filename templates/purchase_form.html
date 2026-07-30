@@ -4,114 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }} | PurchaseGuard</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <h1>{{ page_title }}</h1>
-
-    <form method="post">
-        <div>
-            <label for="item_name">Item name</label>
-            <input
-                type="text"
-                id="item_name"
-                name="item_name"
-                value="{{ purchase.item_name if purchase else '' }}"
-                required
-            >
-        </div>
-
-        <div>
-            <label for="category">Category</label>
-            <input
-                type="text"
-                id="category"
-                name="category"
-                value="{{ purchase.category if purchase and purchase.category else '' }}"
-            >
-        </div>
-
-        <div>
-            <label for="store_name">Store name</label>
-            <input
-                type="text"
-                id="store_name"
-                name="store_name"
-                value="{{ purchase.store_name if purchase and purchase.store_name else '' }}"
-            >
-        </div>
-
-        <div>
-            <label for="purchase_date">Purchase date</label>
-            <input
-                type="date"
-                id="purchase_date"
-                name="purchase_date"
-                value="{{ purchase.purchase_date.isoformat() if purchase and purchase.purchase_date else '' }}"
-                required
-            >
-        </div>
-
-        <div>
-            <label for="price">Price</label>
-            <input
-                type="number"
-                id="price"
-                name="price"
-                min="0"
-                value="{{ purchase.price if purchase and purchase.price is not none else '' }}"
-            >
-        </div>
-
-        <div>
-            <label for="return_deadline">Return deadline</label>
-            <input
-                type="date"
-                id="return_deadline"
-                name="return_deadline"
-                value="{{ purchase.return_deadline.isoformat() if purchase and purchase.return_deadline else '' }}"
-            >
-        </div>
-
-        <div>
-            <label for="warranty_end_date">Warranty end date</label>
-            <input
-                type="date"
-                id="warranty_end_date"
-                name="warranty_end_date"
-                value="{{ purchase.warranty_end_date.isoformat() if purchase and purchase.warranty_end_date else '' }}"
-            >
-        </div>
-
-        <div>
-            <label for="notes">Notes</label>
-            <textarea
-                id="notes"
-                name="notes"
-                rows="4"
-            >{{ purchase.notes if purchase and purchase.notes else '' }}</textarea>
-        </div>
-
-        <button type="submit">{{ button_text }}</button>
-    </form>
-
-    <p>
-        {% if purchase %}
-            <a href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}">
-                Back to purchase details
+    <main class="page">
+        <header class="site-header">
+            <a class="brand" href="{{ url_for('index') }}">
+                <div class="brand-mark">P</div>
+                <div>
+                    <h1>PurchaseGuard</h1>
+                    <p>Returns and warranties, under control.</p>
+                </div>
             </a>
-        {% else %}
-            <a href="{{ url_for('index') }}">
-                Back to purchases
-            </a>
-        {% endif %}
-    </p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <section class="form-card card">
+            <h2 class="form-title">{{ page_title }}</h2>
+            <p class="form-description">
+                Enter the purchase information you want to track.
+            </p>
+
+            <form method="post">
+                <div class="form-grid">
+                    <div class="form-field form-field-full">
+                        <label for="item_name">
+                            Item name
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="item_name"
+                            name="item_name"
+                            value="{{ purchase.item_name if purchase else '' }}"
+                            placeholder="e.g. Mechanical Keyboard"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="category">Category</label>
+                        <input
+                            type="text"
+                            id="category"
+                            name="category"
+                            value="{{ purchase.category if purchase and purchase.category else '' }}"
+                            placeholder="e.g. Electronics"
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="store_name">Store name</label>
+                        <input
+                            type="text"
+                            id="store_name"
+                            name="store_name"
+                            value="{{ purchase.store_name if purchase and purchase.store_name else '' }}"
+                            placeholder="e.g. Amazon"
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="purchase_date">
+                            Purchase date
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="date"
+                            id="purchase_date"
+                            name="purchase_date"
+                            value="{{ purchase.purchase_date.isoformat() if purchase and purchase.purchase_date else '' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="price">Price</label>
+                        <input
+                            type="number"
+                            id="price"
+                            name="price"
+                            min="0"
+                            value="{{ purchase.price if purchase and purchase.price is not none else '' }}"
+                            placeholder="e.g. 12000"
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="return_deadline">
+                            Return deadline
+                        </label>
+                        <input
+                            type="date"
+                            id="return_deadline"
+                            name="return_deadline"
+                            value="{{ purchase.return_deadline.isoformat() if purchase and purchase.return_deadline else '' }}"
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="warranty_end_date">
+                            Warranty end date
+                        </label>
+                        <input
+                            type="date"
+                            id="warranty_end_date"
+                            name="warranty_end_date"
+                            value="{{ purchase.warranty_end_date.isoformat() if purchase and purchase.warranty_end_date else '' }}"
+                        >
+                    </div>
+
+                    <div class="form-field form-field-full">
+                        <label for="notes">Notes</label>
+                        <textarea
+                            id="notes"
+                            name="notes"
+                            rows="4"
+                            placeholder="Add any useful details..."
+                        >{{ purchase.notes if purchase and purchase.notes else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button
+                        class="button button-primary"
+                        type="submit"
+                    >
+                        {{ button_text }}
+                    </button>
+
+                    {% if purchase %}
+                        <a
+                            class="button button-secondary"
+                            href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}"
+                        >
+                            Cancel
+                        </a>
+                    {% else %}
+                        <a
+                            class="button button-secondary"
+                            href="{{ url_for('index') }}"
+                        >
+                            Cancel
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </section>
+    </main>
 </body>
 </html>
