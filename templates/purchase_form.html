@@ -48,7 +48,10 @@
                             type="text"
                             id="item_name"
                             name="item_name"
-                            value="{{ purchase.item_name if purchase else '' }}"
+                            value="{{ request.form.get(
+                                'item_name',
+                                purchase.item_name if purchase else ''
+                            ) }}"
                             placeholder="e.g. Mechanical Keyboard"
                             required
                         >
@@ -60,7 +63,12 @@
                             type="text"
                             id="category"
                             name="category"
-                            value="{{ purchase.category if purchase and purchase.category else '' }}"
+                            value="{{ request.form.get(
+                                'category',
+                                purchase.category
+                                if purchase and purchase.category
+                                else ''
+                            ) }}"
                             placeholder="e.g. Electronics"
                         >
                     </div>
@@ -71,7 +79,12 @@
                             type="text"
                             id="store_name"
                             name="store_name"
-                            value="{{ purchase.store_name if purchase and purchase.store_name else '' }}"
+                            value="{{ request.form.get(
+                                'store_name',
+                                purchase.store_name
+                                if purchase and purchase.store_name
+                                else ''
+                            ) }}"
                             placeholder="e.g. Amazon"
                         >
                     </div>
@@ -85,7 +98,12 @@
                             type="date"
                             id="purchase_date"
                             name="purchase_date"
-                            value="{{ purchase.purchase_date.isoformat() if purchase and purchase.purchase_date else '' }}"
+                            value="{{ request.form.get(
+                                'purchase_date',
+                                purchase.purchase_date.isoformat()
+                                if purchase and purchase.purchase_date
+                                else ''
+                            ) }}"
                             required
                         >
                     </div>
@@ -97,7 +115,12 @@
                             id="price"
                             name="price"
                             min="0"
-                            value="{{ purchase.price if purchase and purchase.price is not none else '' }}"
+                            value="{{ request.form.get(
+                                'price',
+                                purchase.price
+                                if purchase and purchase.price is not none
+                                else ''
+                            ) }}"
                             placeholder="e.g. 12000"
                         >
                     </div>
@@ -110,7 +133,12 @@
                             type="date"
                             id="return_deadline"
                             name="return_deadline"
-                            value="{{ purchase.return_deadline.isoformat() if purchase and purchase.return_deadline else '' }}"
+                            value="{{ request.form.get(
+                                'return_deadline',
+                                purchase.return_deadline.isoformat()
+                                if purchase and purchase.return_deadline
+                                else ''
+                            ) }}"
                         >
                     </div>
 
@@ -122,7 +150,12 @@
                             type="date"
                             id="warranty_end_date"
                             name="warranty_end_date"
-                            value="{{ purchase.warranty_end_date.isoformat() if purchase and purchase.warranty_end_date else '' }}"
+                            value="{{ request.form.get(
+                                'warranty_end_date',
+                                purchase.warranty_end_date.isoformat()
+                                if purchase and purchase.warranty_end_date
+                                else ''
+                            ) }}"
                         >
                     </div>
 
@@ -133,7 +166,12 @@
                             name="notes"
                             rows="4"
                             placeholder="Add any useful details..."
-                        >{{ purchase.notes if purchase and purchase.notes else '' }}</textarea>
+                        >{{ request.form.get(
+                            'notes',
+                            purchase.notes
+                            if purchase and purchase.notes
+                            else ''
+                        ) }}</textarea>
                     </div>
                 </div>
 
@@ -148,7 +186,10 @@
                     {% if purchase %}
                         <a
                             class="button button-secondary"
-                            href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}"
+                            href="{{ url_for(
+                                'purchase_detail',
+                                purchase_id=purchase.id
+                            ) }}"
                         >
                             Cancel
                         </a>
