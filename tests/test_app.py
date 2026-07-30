@@ -358,3 +358,67 @@ def test_edit_purchase_rejects_warranty_end_before_purchase_date(
         )
 
         assert purchase.warranty_end_date is None
+
+def test_create_purchase_preserves_input_after_validation_error(
+    client,
+):
+    response = client.post(
+        "/purchases/new",
+        data={
+            "item_name": "Wireless Headphones",
+            "category": "Electronics",
+            "store_name": "Example Store",
+            "purchase_date": "2026-07-30",
+            "price": "-1000",
+            "return_deadline": "2026-08-10",
+            "warranty_end_date": "2027-07-30",
+            "notes": "Keep the receipt.",
+        },
+    )
+
+    assert response.status_code == 200
+    assert b'Wireless Headphones' in response.data
+    assert b'Electronics' in response.data
+    assert b'Example Store' in response.data
+    assert b'2026-07-30' in response.data
+    assert b'-1000' in response.data
+    assert b'2026-08-10' in response.data
+    assert b'2027-07-30' in response.data
+    assert b'Keep the receipt.' in response.data
+
+
+def test_edit_purchase_preserves_input_after_validation_error(
+    client,
+    app,
+):
+    add_purchase(client)
+
+    with app.app_context():
+        purchase = db.session.execute(
+            db.select(Purchase)
+        ).scalar_one()
+        purchase_id = purchase.id
+
+    response = client.post(
+        f"/purchases/{purchase_id}/edit",
+        data={
+            "item_name": "Edited Laptop",
+            "category": "Computers",
+            "store_name": "New Store",
+            "purchase_date": "2026-07-30",
+            "price": "-2000",
+            "return_deadline": "2026-08-15",
+            "warranty_end_date": "2027-07-30",
+            "notes": "Edited notes.",
+        },
+    )
+
+    assert response.status_code == 200
+    assert b'Edited Laptop' in response.data
+    assert b'Computers' in response.data
+    assert b'New Store' in response.data
+    assert b'2026-07-30' in response.data
+    assert b'-2000' in response.data
+    assert b'2026-08-15' in response.data
+    assert b'2027-07-30' in response.data
+    assert b'Edited notes.' in response.data
