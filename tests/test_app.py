@@ -1,5 +1,5 @@
+from datetime import date, timedelta
 import pytest
-
 from app import Purchase, create_app, db
 
 
@@ -422,3 +422,45 @@ def test_edit_purchase_preserves_input_after_validation_error(
     assert b'2026-08-15' in response.data
     assert b'2027-07-30' in response.data
     assert b'Edited notes.' in response.data
+
+def test_return_status_tone():
+    purchase = Purchase(
+        item_name="Test Item",
+        purchase_date=date.today(),
+    )
+
+    purchase.return_deadline = None
+    assert purchase.return_status_tone == "neutral"
+
+    purchase.return_deadline = date.today() - timedelta(days=1)
+    assert purchase.return_status_tone == "danger"
+
+    purchase.return_deadline = date.today()
+    assert purchase.return_status_tone == "warning"
+
+    purchase.return_deadline = date.today() + timedelta(days=1)
+    assert purchase.return_status_tone == "warning"
+
+    purchase.return_deadline = date.today() + timedelta(days=2)
+    assert purchase.return_status_tone == "success"
+
+def test_warranty_status_tone():
+    purchase = Purchase(
+        item_name="Test Item",
+        purchase_date=date.today(),
+    )
+
+    purchase.warranty_end_date = None
+    assert purchase.warranty_status_tone == "neutral"
+
+    purchase.warranty_end_date = date.today() - timedelta(days=1)
+    assert purchase.warranty_status_tone == "danger"
+
+    purchase.warranty_end_date = date.today()
+    assert purchase.warranty_status_tone == "warning"
+
+    purchase.warranty_end_date = date.today() + timedelta(days=1)
+    assert purchase.warranty_status_tone == "warning"
+
+    purchase.warranty_end_date = date.today() + timedelta(days=2)
+    assert purchase.warranty_status_tone == "success"

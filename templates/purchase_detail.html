@@ -39,7 +39,10 @@
 
             <a
                 class="button button-primary"
-                href="{{ url_for('edit_purchase', purchase_id=purchase.id) }}"
+                href="{{ url_for(
+                    'edit_purchase',
+                    purchase_id=purchase.id
+                ) }}"
             >
                 Edit Purchase
             </a>
@@ -75,13 +78,17 @@
 
                 <div class="detail-item">
                     <dt>Return deadline</dt>
-                    <dd>{{ purchase.return_deadline or "—" }}</dd>
+                    <dd>
+                        {{ purchase.return_deadline or "—" }}
+                    </dd>
                 </div>
 
                 <div class="detail-item">
                     <dt>Return status</dt>
                     <dd>
-                        <span class="status">
+                        <span
+                            class="status status-{{ purchase.return_status_tone }}"
+                        >
                             {{ purchase.return_status }}
                         </span>
                     </dd>
@@ -89,13 +96,17 @@
 
                 <div class="detail-item">
                     <dt>Warranty end date</dt>
-                    <dd>{{ purchase.warranty_end_date or "—" }}</dd>
+                    <dd>
+                        {{ purchase.warranty_end_date or "—" }}
+                    </dd>
                 </div>
 
                 <div class="detail-item">
                     <dt>Warranty status</dt>
                     <dd>
-                        <span class="status">
+                        <span
+                            class="status status-{{ purchase.warranty_status_tone }}"
+                        >
                             {{ purchase.warranty_status }}
                         </span>
                     </dd>
@@ -123,8 +134,13 @@
                 <form
                     class="inline-form"
                     method="post"
-                    action="{{ url_for('delete_purchase', purchase_id=purchase.id) }}"
-                    onsubmit="return confirm('Are you sure you want to delete this purchase?');"
+                    action="{{ url_for(
+                        'delete_purchase',
+                        purchase_id=purchase.id
+                    ) }}"
+                    onsubmit="return confirm(
+                        'Are you sure you want to delete this purchase?'
+                    );"
                 >
                     <button
                         class="button button-danger"

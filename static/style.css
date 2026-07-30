@@ -13,8 +13,6 @@
     --success-text: #247044;
     --error-background: #fff0f1;
     --error-text: #a72e3b;
-    --warning-background: #fff7df;
-    --warning-text: #906b15;
     --shadow: 0 12px 30px rgba(24, 34, 48, 0.08);
     --radius: 14px;
 }
@@ -194,7 +192,10 @@ textarea {
 
 .filters {
     display: grid;
-    grid-template-columns: minmax(220px, 1fr) minmax(200px, 280px) auto;
+    grid-template-columns:
+        minmax(220px, 1fr)
+        minmax(200px, 280px)
+        auto;
     align-items: end;
     gap: 14px;
     padding: 18px;
@@ -304,10 +305,28 @@ tbody tr:hover {
     align-items: center;
     padding: 4px 9px;
     border-radius: 999px;
-    background: #edf2ff;
-    color: #3552a8;
     font-size: 12px;
     font-weight: 750;
+}
+
+.status-neutral {
+    background: #eef2f6;
+    color: #526173;
+}
+
+.status-success {
+    background: #e8f7ee;
+    color: #247044;
+}
+
+.status-warning {
+    background: #fff4d6;
+    color: #8a6512;
+}
+
+.status-danger {
+    background: #ffe7e9;
+    color: #a72e3b;
 }
 
 .empty-state {
@@ -359,7 +378,8 @@ tbody tr:hover {
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
     gap: 18px;
 }
 
@@ -404,7 +424,8 @@ tbody tr:hover {
 
 .detail-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
     gap: 0;
     margin: 0;
 }
