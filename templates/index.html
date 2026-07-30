@@ -52,7 +52,8 @@
             <div class="section-heading">
                 <h2>Your purchases</h2>
                 <span class="muted">
-                    {{ purchases|length }} item{% if purchases|length != 1 %}s{% endif %}
+                    {{ purchases|length }}
+                    item{% if purchases|length != 1 %}s{% endif %}
                 </span>
             </div>
 
@@ -81,18 +82,21 @@
                         >
                             Recently added
                         </option>
+
                         <option
                             value="purchase_date_desc"
                             {% if selected_sort == "purchase_date_desc" %}selected{% endif %}
                         >
                             Newest purchase date
                         </option>
+
                         <option
                             value="purchase_date_asc"
                             {% if selected_sort == "purchase_date_asc" %}selected{% endif %}
                         >
                             Oldest purchase date
                         </option>
+
                         <option
                             value="return_deadline_asc"
                             {% if selected_sort == "return_deadline_asc" %}selected{% endif %}
@@ -137,20 +141,34 @@
                                 <th>Warranty status</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {% for purchase in purchases %}
                                 <tr>
                                     <td>
                                         <a
                                             class="item-link"
-                                            href="{{ url_for('purchase_detail', purchase_id=purchase.id) }}"
+                                            href="{{ url_for(
+                                                'purchase_detail',
+                                                purchase_id=purchase.id
+                                            ) }}"
                                         >
                                             {{ purchase.item_name }}
                                         </a>
                                     </td>
-                                    <td>{{ purchase.category or "—" }}</td>
-                                    <td>{{ purchase.store_name or "—" }}</td>
-                                    <td>{{ purchase.purchase_date }}</td>
+
+                                    <td>
+                                        {{ purchase.category or "—" }}
+                                    </td>
+
+                                    <td>
+                                        {{ purchase.store_name or "—" }}
+                                    </td>
+
+                                    <td>
+                                        {{ purchase.purchase_date }}
+                                    </td>
+
                                     <td>
                                         {% if purchase.price is not none %}
                                             ¥{{ "{:,}".format(purchase.price) }}
@@ -158,15 +176,27 @@
                                             —
                                         {% endif %}
                                     </td>
-                                    <td>{{ purchase.return_deadline or "—" }}</td>
+
                                     <td>
-                                        <span class="status">
+                                        {{ purchase.return_deadline or "—" }}
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="status status-{{ purchase.return_status_tone }}"
+                                        >
                                             {{ purchase.return_status }}
                                         </span>
                                     </td>
-                                    <td>{{ purchase.warranty_end_date or "—" }}</td>
+
                                     <td>
-                                        <span class="status">
+                                        {{ purchase.warranty_end_date or "—" }}
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="status status-{{ purchase.warranty_status_tone }}"
+                                        >
                                             {{ purchase.warranty_status }}
                                         </span>
                                     </td>
@@ -175,10 +205,12 @@
                         </tbody>
                     </table>
                 </div>
+
             {% elif search_query %}
                 <div class="empty-state">
                     <h3>No matching purchases</h3>
                     <p>Try changing or clearing your search.</p>
+
                     <a
                         class="button button-secondary"
                         href="{{ url_for('index') }}"
@@ -186,10 +218,14 @@
                         Clear search
                     </a>
                 </div>
+
             {% else %}
                 <div class="empty-state">
                     <h3>No purchases yet</h3>
-                    <p>Add your first purchase to start tracking it.</p>
+                    <p>
+                        Add your first purchase to start tracking it.
+                    </p>
+
                     <a
                         class="button button-primary"
                         href="{{ url_for('create_purchase') }}"

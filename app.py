@@ -43,6 +43,40 @@ class Purchase(db.Model):
     )
 
     @property
+    def return_status_tone(self):
+        if self.return_deadline is None:
+            return "neutral"
+
+        days_remaining = (
+            self.return_deadline - date.today()
+        ).days
+
+        if days_remaining < 0:
+            return "danger"
+
+        if days_remaining <= 1:
+            return "warning"
+
+        return "success"
+
+    @property
+    def warranty_status_tone(self):
+        if self.warranty_end_date is None:
+            return "neutral"
+
+        days_remaining = (
+            self.warranty_end_date - date.today()
+        ).days
+
+        if days_remaining < 0:
+            return "danger"
+
+        if days_remaining <= 1:
+            return "warning"
+
+        return "success"
+
+    @property
     def return_status(self):
         if self.return_deadline is None:
             return "No deadline"
